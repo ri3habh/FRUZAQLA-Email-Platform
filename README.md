@@ -1,4 +1,6 @@
-# Solstice — FRUZAQLA® Email Platform
+# Solstice's FRUZAQLA® Email Platform
+
+Video Demo Link: https://youtu.be/PAtU2kxweZ8
 
 An FDA-compliant pharmaceutical email authoring tool built for the Solstice Full Stack Engineer take-home assignment. Marketers compose promotional emails for FRUZAQLA (fruquintinib) using a canvas of pre-approved clinical claims, locked boilerplate blocks, and brand assets — with compliance checks enforced before every export.
 
