@@ -1,0 +1,17 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Fallback brand tokens — overridden at runtime from BrandConfig */
+  --brand-primary_color: #002855;
+  --brand-secondary_color: #8C4799;
+  --brand-light_blue: #59CBE8;
+  --brand-green: #97D700;
+  --brand-yellow: #FFC72C;
+  --brand-black_80: #333333;
+  --brand-font_family: var(--font-rubik), "Rubik", sans-serif;
+  --brand-font_family_condensed: var(--font-roboto-condensed), "Roboto Condensed", sans-serif;
+  --brand-email_max_width: 600px;
+  --brand-background_color: #ffffff;
+}

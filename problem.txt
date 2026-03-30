@@ -1,0 +1,83 @@
+Solstice - Full Stack Engineer Take-Home Assignment [cite: 1, 2, 25, 51, 70]
+
+Time expectation: 4-6 hours | Deadline: 5 days from receipt [cite: 3]
+We care most about how you think through the problem, your architecture decisions, product instincts, and ability to communicate your reasoning over how much you build or how polished it looks. [cite: 4]
+Please review this document in full before asking any questions. [cite: 5]
+
+### The Problem [cite: 6]
+Pharmaceutical companies need to create marketing content (emails, banner ads, social posts, slide decks) under strict FDA regulations: [cite: 7]
+* Content must come from approved sources. All claims must be sourced from clinical literature or previously approved content-nothing can be invented or paraphrased. [cite: 8]
+* Visual assets are restricted. All images, icons, and graphs must come from an approved library. [cite: 9]
+* Content goes through heavy iteration. Expect 5-10+ revision cycles before a piece is approved. [cite: 10]
+* Everything must pass compliance checks. Every claim is fact-checked, FDA rules verified, and channel compatibility confirmed. [cite: 11]
+
+Target therapeutic: FRUZAQLA [cite: 12]
+Target users: Marketing managers with limited technical expertise who need to create compliant content quickly. [cite: 13]
+
+### Deliverables [cite: 14]
+
+Part 1: Design Artifacts [cite: 15]
+These can live in your repo (as markdown, images, or a /docs folder) or as a separate document-your choice. [cite: 16]
+* 1.1 User Flow: A high-level user journey showing how a user goes from initial intent to final approved HTML content. [cite: 17] Address key decision points, where AI fits vs. human control, and how you balance guidance with user autonomy. [cite: 18]
+* 1.2 System Architecture Diagram: Technical architecture covering: frontend components and state management, backend services and APIs, data models, LLM integration, and storage. [cite: 19] Use any diagramming tool. [cite: 20]
+* 1.3 Data Model: Core entities and their relationships-at minimum: content projects, approved claims, visual assets, content versions, compliance results, and user permissions. [cite: 21] Format as an ERD or schema definitions. [cite: 22]
+
+Part 2: Working Prototype [cite: 23]
+Build a working prototype that demonstrates your architecture decisions. Implement one complete path through the system: [cite: 26]
+* Landing page with content type selection [cite: 27]
+* Conversational interface to gather requirements [cite: 28]
+* Display of recommended approved claims based on context [cite: 29]
+* Preview of generated HTML content [cite: 30]
+* Basic editing capability (text changes via natural language) [cite: 31]
+Pick one content type of your choosing (email, banner ad, slide, or social post) [cite: 32]
+
+Tech Stack [cite: 33]
+* Frontend: Next.js 14+ (App Router preferred), TypeScript strongly encouraged, styling of your choice [cite: 34]
+* Backend: Python (FastAPI or Flask as a separate service), communicating with the Next.js frontend via API [cite: 35]
+* Database: Your choice (PostgreSQL, MongoDB, etc.) [cite: 36]
+* LLM: Anthropic Claude API (key provided in the email accompanying this assignment) [cite: 37]
+
+### Submission [cite: 38]
+1. Push your code to a private GitHub repository and submit your repo URL through by replying to the email. [cite: 39]
+2. Include a README with: setup instructions (we should be able to run it locally), and a brief explanation of your architecture decisions. [cite: 40]
+
+### What Happens Next [cite: 41]
+After you submit, we'll review your work and schedule a 30-minute technical review within a few business days. [cite: 42] During that session we'll walk through your prototype together and discuss topics like: [cite: 43]
+* Why you chose your particular user flow over alternatives [cite: 44]
+* How your design prevents non-compliant content from being created [cite: 45]
+* The role of AI generation vs. template-based assembly and how you constrain LLM output to approved content [cite: 46]
+* How you'd handle content versioning, branching, and undo/redo at scale [cite: 47]
+* How you'd extend the system for real-time collaboration and approval workflows [cite: 48]
+You don't need to prepare slides or a presentation-just be ready to talk through your code and design decisions. [cite: 49]
+
+### Questions to Consider [cite: 52]
+1. How do you prevent users from accidentally creating non-compliant content? [cite: 53] UI affordances vs. backend validation? [cite: 54, 55] Real-time warnings vs. batch checking? [cite: 56]
+2. What's the role of AI vs. templates? [cite: 57, 58] When should you use LLM generation vs. template-based assembly? [cite: 59, 60] How do you ensure AI output uses only approved content? [cite: 61]
+3. How do you track content lineage? [cite: 62] If content is edited 15 times, how do you show history? [cite: 63] How do you handle forking/branching? [cite: 64] What level of undo/redo granularity makes sense? [cite: 65]
+4. How do you design for collaboration? [cite: 66] Multiple stakeholders reviewing the same content [cite: 67] Comments, suggestions [cite: 68]
+
+### Appendix: Domain Workflow Reference [cite: 71]
+This section describes the full content creation workflow in more detail. [cite: 72] Use it as context for your design decisions-you are not expected to implement all of these steps. [cite: 73]
+
+1. Request Creation [cite: 74]
+Users specify content type (email, banner ad, social post, slide deck), target audience (HCPs, patients, caregivers), campaign goal (awareness, education, CTA), therapeutic context, and tone (clinical, empathetic, urgent, informative). [cite: 75]
+
+2. Conversational Alignment [cite: 76]
+The system asks clarifying questions, the user provides context on messaging priorities, the system suggests relevant approved claims, and the user selects which to include and their priority. [cite: 77]
+
+3. Claim Selection & Sourcing [cite: 78]
+Every claim must be traceable to its source. Display format example: "This claim sourced from: [FRUZAQLA Phase 3 Trial, The Lancet, 2023]." [cite: 79] Users must explicitly approve each claim before generation proceeds. [cite: 80]
+
+4. Content Generation [cite: 81]
+The system assembles HTML output by combining selected claims with formatting, applying brand guidelines, inserting approved visual assets, and maintaining compliance metadata (sources, approval dates). [cite: 82]
+
+5. Iterative Editing [cite: 83]
+Two editing modes: natural language ("Move the efficacy data above the safety information") and direct inline editing with change tracking. [cite: 84] Also includes asset swapping from the approved library and automatic compliance re-validation after changes. [cite: 85]
+
+6. Compliance Review [cite: 86]
+Before export, the system validates: all claims match the approved library (exact text match), visual assets are from the approved library, FDA-required disclosures are present (ISI, fair balance), grammar and spelling are correct, and channel compatibility is confirmed. [cite: 87] Results are green checks, yellow warnings, or red flags (which block export). [cite: 88]
+
+7. Export & Distribution [cite: 89]
+Final output includes: an HTML file with embedded inline CSS, a metadata file (claims used, sources, approval chain), a compliance report, and an asset manifest. [cite: 90]
+
+Questions? Reach out to Kwa Woods at kwa@solsticehealth.co. Asking good questions is a signal, not a weakness. [cite: 91]

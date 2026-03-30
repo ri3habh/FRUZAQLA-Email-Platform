@@ -1,0 +1,99 @@
+Here is the updated Python script that automatically sorts the extracted images into subfolders based on their file extensions (e.g., all PNGs go into a `png` folder). 
+
+### 1. The Asset Sorting Script
+
+```python
+import fitz  # PyMuPDF
+import io
+import os
+from PIL import Image
+
+def extract_and_sort_assets(pdf_path, base_output_dir="fruzaqla_assets"):
+    """
+    Extracts images from a PDF, filters out artifacts, and sorts them into subfolders by file type.
+    """
+    try:
+        doc = fitz.open(pdf_path)
+    except Exception as e:
+        print(f"Error opening PDF: {e}")
+        return
+
+    extracted_count = 0
+    print(f"Scanning {pdf_path} for assets...")
+
+    for page_num in range(len(doc)):
+        page = doc[page_num]
+        images = page.get_images(full=True)
+
+        for img_index, img in enumerate(images):
+            xref = img[0] 
+            
+            base_image = doc.extract_image(xref)
+            image_bytes = base_image["image"]
+            image_ext = base_image["ext"].lower() # Normalize extension
+
+            try:
+                # Load into Pillow to check dimensions
+                image = Image.open(io.BytesIO(image_bytes))
+                
+                # Filter: Skip images smaller than 50x50 pixels
+                if image.width < 50 or image.height < 50:
+                    continue
+                
+                # Create a specific subfolder for this file type
+                type_dir = os.path.join(base_output_dir, image_ext)
+                os.makedirs(type_dir, exist_ok=True)
+
+                # Format and save the output file
+                image_name = f"page_{page_num + 1}_asset_{img_index + 1}.{image_ext}"
+                image_path = os.path.join(type_dir, image_name)
+
+                with open(image_path, "wb") as f:
+                    f.write(image_bytes)
+                    
+                extracted_count += 1
+                
+            except Exception as e:
+                print(f"Skipped image {img_index} on page {page_num + 1}: {e}")
+
+    print(f"\nExtraction complete! Successfully ripped and sorted {extracted_count} assets into '{base_output_dir}'.")
+
+if __name__ == "__main__":
+    target_pdf = "FRUZAQLA Style Guide - Solstice.pdf"
+    extract_and_sort_assets(target_pdf)
+```
+
+---
+
+### 2. The FRUZAQLA Design Requirements Document
+
+Here is the extracted textual data you need to ensure your content is perfectly on-brand. 
+
+#### **Color Palette**
+Exact brand colors should be consistent and appear across all promotional materials. Colors outside of this palette should not be used.
+* **Primary (Purple):** Pantone 258 C. HEX: 804799. RGB: 140, 71, 153. CMYK: 51, 79, 0, 0.
+* **Secondary (Light Blue):** Pantone 305 C. HEX: 59CBE8. RGB: 89, 203, 232. CMYK: 54, 0, 6, 0.
+* **Tertiary (Dark Blue):** Pantone 295 C. HEX: 002855. RGB: 0, 40, 85. CMYK: 100, 69, 8, 54.
+* **Tertiary (Green):** Pantone 375 C. HEX: 970700. RGB: 151, 215, 0. CMYK: 46, 0, 90, 0.
+* **Tertiary (Yellow):** Pantone 123 C. HEX: FFC72C. RGB: 255, 199, 44. CMYK: 0, 19, 89, 0.
+* **Tints and Shades:** Avoid using shades and tints above 40%. Avoid using tints below 20%.
+
+#### **Typography**
+* **Primary Font:** Rubik is the font for all communications across print and digital channels.
+* **Special Use Font:** Roboto Condensed is the font used when the page is copy heavy and it is necessary to maximize space.
+* **Email Exceptions:** The preferred font for copy on emails is the Arial family.
+
+#### **Text Hierarchy & Formatting**
+* **Headlines:** Headlines use Rubik Bold in dark blue and are sentence case. 
+* **Chart/Table Headers:** Chart heads use Rubik Bold in purple and are sentence case. Column heads use Rubik Bold in purple or Rubik Bold in 80% black.
+* **Body Copy:** Bold body copy uses Rubik Bold in dark blue. Bullet point body copy uses Rubik Regular in dark blue. 
+* **Data Callouts:** Key data points use Rubik Bold in purple. Supporting subheads use Rubik Bold in purple. 
+
+#### **Digital Usage & ADA Compliance**
+* **HCP Audience Palette:** For HCP materials, always use the purple as the primary, the light blue and green as the secondary, and the navy for text. Minimize the usage of yellow.
+* **Patient Audience Palette:** For patient materials, always use the purple as the primary, the yellow as secondary, the light blue and green as tertiary, and navy for text. Emphasize the usage of yellow.
+* **Banner Buttons:** Primary CTAs use navy color with white text and should be rounded. 
+* **Email Buttons:** Primary CTAs use the primary purple color with white CTA copy and should be squared off.
+* **Accessibility Contrast:** Color contrast for text that is 18 pt or 14 pt bold must have a ratio of at least 3:1. Text that is regular 16 pt and below must have a ratio of 4.5:1. Graphic elements like button borders must have a ratio of at least 3:1. 
+
+Would you like me to help you format a quick HTML/CSS boilerplate file utilizing these exact HEX codes and typography rules?

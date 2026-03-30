@@ -1,0 +1,195 @@
+Here are the three diagrams to draw in Google Drawings, then I'll immediately start coding.
+
+1. User Flow — Flowchart
+Canvas setup: File → Page setup → Custom → 1200×900px. Use View → Snap to grid.
+
+Shapes to use:
+
+Oval = Start / End (fill: #1B3A6B, white text)
+Rounded rectangle = User action (fill: #D6E8FA, border: #4A90D9)
+Rounded rectangle = AI/system action (fill: #FDE8D8, border: #E8502A)
+Diamond = Decision (fill: #FFF3CD, border: #F0A500)
+Rounded rectangle = Success state (fill: #D4EDDA, border: #28A745)
+Draw top-to-bottom in this order:
+
+
+[START oval]
+     ↓
+[Visit /projects → see project grid]  (blue)
+     ↓
+[Click "New Project" → enter name]  (blue)
+     ↓
+◆ First time on canvas?
+  YES →  [Enter name + pick color → saved to localStorage]  (blue)
+  NO  →  (skip, merge below)
+     ↓
+[Canvas opens — empty]  (orange, system)
+     ↓
+◆ How to build layout?
+  PATH A →  [Drag claim card from sidebar]  (blue)
+            [Drop on canvas]  (blue)
+            [TextBlock created ✓ pre-verified]  (green)
+  PATH B →  [Toggle Sketch mode → draw wireframe]  (blue)
+            [Click "Interpret Layout"]  (blue)
+            [Claude generates block structure]  (orange, AI)
+     ↓ (both paths merge)
+[Type in TextBlock]  (blue)
+     ↓
+[Claim suggestion popover appears]  (orange, AI)
+     ↓
+◆ Accept suggestion?
+  YES →  [Text snaps to exact claim → verified ✓]  (green)
+  NO  →  [Yellow warning — unverified]  (yellow diamond fill)
+     ↓
+◆ All blocks verified?
+  NO  →  [Compliance banner → scroll to issue]  (yellow) → loop back up
+  YES →  [Export button active]  (green)
+     ↓
+[Click Export → HTML email downloaded]  (green)
+     ↓
+[Optional: Share URL → collaborators join]  (blue)
+     ↓
+[Optional: View History timeline]  (blue)
+     ↓
+[END oval]
+Arrow labels: Label decision arrows "Yes" / "No". Label the two build paths "A: Drag & Drop" and "B: Sketch".
+
+2. System Architecture — Layered Box Diagram
+Canvas setup: 1400×800px, landscape.
+
+Draw 4 vertical columns (left to right):
+
+
+COL 1: "Browser"                     (light blue bg box, fill #EBF4FA)
+  ┌──────────────────┐
+  │  Canvas UI       │  (white box)
+  │  BlockCanvas     │
+  │  DnD blocks      │
+  │  Tiptap editors  │
+  │  SketchOverlay   │
+  ├──────────────────┤
+  │  WebSocket       │  (white box)
+  │  Client          │
+  │  useCollab()     │
+  ├──────────────────┤
+  │  HTTP Client     │  (white box)
+  │  lib/api.ts      │
+  └──────────────────┘
+
+COL 2: "Next.js Server"              (light gray bg box, fill #F5F5F5)
+  ┌──────────────────┐
+  │  API Route       │  (white box)
+  │  Handlers        │
+  │  (thin proxy)    │
+  └──────────────────┘
+
+COL 3: "FastAPI Backend"             (light orange bg box, fill #FFF0E8)
+  ┌──────────────────┐
+  │  REST Routers    │  (white box)
+  │  /blocks         │
+  │  /claims         │
+  │  /compliance     │
+  │  /review         │
+  ├──────────────────┤
+  │  WebSocket       │  (white box)
+  │  Manager         │
+  │  /ws/projects    │
+  ├──────────────────┤
+  │  Compliance      │  (white box)
+  │  Engine          │
+  │  (rule-based)    │
+  ├──────────────────┤
+  │  Claude Client   │  (white box)
+  │  Anthropic SDK   │
+  └──────────────────┘
+
+COL 4: "External"                    (light green bg box, fill #E8F5E9)
+  ┌──────────────────┐
+  │  SQLite DB       │  (cylinder shape, fill #C8E6C9)
+  │  10 tables       │
+  └──────────────────┘
+
+  ┌──────────────────┐
+  │  Claude API      │  (white box, dashed border)
+  │  claude-3.5-     │
+  │  sonnet          │
+  └──────────────────┘
+Arrows to draw:
+
+HTTP Client → Next.js API Routes (solid arrow, label: "REST /api/...")
+Next.js API Routes → FastAPI REST Routers (solid arrow, label: "proxy")
+WebSocket Client → FastAPI WebSocket Manager (solid arrow, skip Next.js, label: "WS /ws/projects/{id}")
+FastAPI REST Routers → SQLite DB (solid arrow)
+FastAPI WebSocket Manager → SQLite DB (solid arrow)
+FastAPI Claude Client → Claude API (dashed arrow, label: "generate / match / interpret")
+Key callout box (yellow sticky note shape): "WebSocket bypasses Next.js — connects directly to FastAPI on port 8000"
+
+3. Data Model — ERD
+Canvas setup: 1600×1000px. Group tables by color.
+
+Draw 10 table rectangles (header bar + field rows):
+
+Color groups:
+
+Blue (#BBDEFB) header: User, ContentProject — core entities
+Orange (#FFE0B2) header: CanvasState, EditEvent — new canvas tables
+Purple (#E1BEE7) header: ContentVersion, ComplianceResult — audit/export
+Green (#C8E6C9) header: SharedLink, Comment — collaboration
+Gray (#F5F5F5) header: ApprovedClaim, VisualAsset — reference data
+Table layouts (header | fields):
+
+
+User                    ContentProject
+────────────────        ────────────────────────
+id (PK)                 id (PK)
+email                   user_id (FK→User)
+name                    title, audience, tone
+created_at              status, created_at
+
+CanvasState             EditEvent
+────────────────        ────────────────────────
+id (PK)                 id (PK)
+project_id (FK, unique) project_id (FK)
+blocks_json             user_name, user_color
+annotations_json        action, block_id
+updated_at              block_type, description
+                        created_at
+
+ContentVersion          ComplianceResult
+────────────────        ────────────────────────
+id (PK)                 id (PK)
+project_id (FK)         version_id (FK)
+html                    status
+version_number          checks_json
+created_at
+
+SharedLink              Comment
+────────────────        ────────────────────────
+id (PK)                 id (PK)
+project_id (FK)         shared_link_id (FK)
+token (UUID)            parent_comment_id (FK self)
+permission              content, author_name
+expires_at              created_at
+
+ApprovedClaim           VisualAsset
+────────────────        ────────────────────────
+id (PK)                 id (PK)
+text                    filename
+category                asset_type
+source_document         description
+source_page
+Relationship lines to draw (use elbow connectors):
+
+User ──1────N── ContentProject
+ContentProject ──1────1── CanvasState
+ContentProject ──1────N── EditEvent
+ContentProject ──1────N── ContentVersion
+ContentProject ──1────N── SharedLink
+ContentVersion ──1────N── ComplianceResult
+SharedLink ──1────N── Comment
+Comment ──0..1──N── Comment (self-ref, label: "replies")
+CanvasState.blocks_json ──dashed──► ApprovedClaim (label: "claim_id ref")
+CanvasState.blocks_json ──dashed──► VisualAsset (label: "asset_id ref")
+Add a note box near CanvasState: "blocks are JSON — claim_id and asset_id are logical references, not DB foreign keys"
+
+Now implementing. Starting with backend, then frontend in parallel.
